@@ -4,9 +4,10 @@ buildscript {
     ext {
         kotlin_version = '1.3.50'
         supportLibVersion = '28.0.0'
-        junitVersion="4.12"
+        junitVersion = "4.12"
     }
     repositories {
+        jcenter()
         google()
         mavenCentral()
         mavenLocal()
@@ -22,6 +23,7 @@ buildscript {
 
 allprojects {
     repositories {
+        jcenter()
         google()
         mavenCentral()
     }
@@ -29,4 +31,8 @@ allprojects {
 
 task clean(type: Delete) {
     delete rootProject.buildDir
+}
+
+ext {
+    remoteMaven = true
 }

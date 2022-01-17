@@ -82,8 +82,14 @@ project.afterEvaluate {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "com.android.support:appcompat-v7:${supportLibVersion}"
-    debugImplementation project(':libpag')
-    releaseImplementation project(':libpag')
+
+    if(rootProject.ext.remoteMaven){
+        implementation 'com.tencent.tav:libpag:3.2.5.1'
+    }else{
+        debugImplementation project(':libpag')
+        releaseImplementation project(':libpag')
+    }
+
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }
 
