@@ -1,2 +1,3 @@
 include ':app', ':libpag'
 include ':demo'
+include ':template'
