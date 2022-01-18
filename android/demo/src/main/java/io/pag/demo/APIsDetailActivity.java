@@ -122,10 +122,14 @@ public class APIsDetailActivity extends AppCompatActivity {
                 int height = outMetrics.heightPixels;
                 pagComposition = PAGComposition.Make(width, height);
                 pagFile1 = PAGFile.Load(getAssets(), "data-TimeStretch.pag");
-                pagFile1.replaceImage(0, PAGImage.FromAssets(getAssets(), "test.png"));
+                PAGText textData = pagFile1.getTextData(0);
+                textData.text = "666";
+                pagFile1.replaceText(0, textData);
+//                pagFile1.replaceImage(0, PAGImage.FromAssets(getAssets(), "test.png"));
                 Matrix matrix = new Matrix();
-                matrix.setTranslate(200, 200);
-                matrix.preScale(0.3f, 0.3f);
+//                matrix.setTranslate(200, 200);
+                matrix.preScale(0.5f, 0.5f);
+//                matrix.setRotate(90);
                 pagFile1.setMatrix(matrix);
                 pagFile1.setDuration(7000000);
                 pagFile1.setStartTime(3000000);
@@ -133,10 +137,10 @@ public class APIsDetailActivity extends AppCompatActivity {
 
                 PAGFile file = PAGFile.Load(getAssets(), "data_video.pag");
                 file.setDuration(10000000);
-                Matrix matrix1 = new Matrix();
-                matrix1.setTranslate((width - file.width()) / 2.0f, (height - file.height()) / 2.0f);
-                matrix1.setScale(width * 1.0f / file.width(), height * 1.0f / file.height());
-                file.setMatrix(matrix1);
+//                Matrix matrix1 = new Matrix();
+//                matrix1.setTranslate((width - file.width()) / 2.0f, (height - file.height()) / 2.0f);
+//                matrix1.setScale(width * 1.0f / file.width(), height * 1.0f / file.height());
+//                file.setMatrix(matrix1);
 
                 pagComposition.addLayerAt(file, 0);
                 pagView.setComposition(pagComposition);
