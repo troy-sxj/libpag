@@ -34,6 +34,13 @@ dependencies {
     implementation 'com.android.support:recyclerview-v7:28.0.0'
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+
+    if(rootProject.ext.remoteMaven){
+        implementation 'com.tencent.tav:libpag:3.2.5.1'
+    }else{
+        implementation project(':libpag')
+    }
+
 }
 
 configurations.all {
