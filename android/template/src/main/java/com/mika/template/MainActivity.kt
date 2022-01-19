@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.View
 import com.mika.template.pag.PAGFileTestActivity
+import com.mika.template.pag.PAGPlayerActivity
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -14,5 +15,9 @@ class MainActivity : AppCompatActivity() {
 
     fun textPAGFile(view: View) {
         startActivity(Intent(this, PAGFileTestActivity::class.java))
+    }
+
+    fun textPAGPlayer(view: View) {
+        startActivity(Intent(this, PAGPlayerActivity::class.java))
     }
 }

@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="20dp"
+    android:orientation="vertical"
     tools:context=".MainActivity">
 
     <Button
@@ -12,7 +13,15 @@
         android:id="@+id/btnFile"
         android:onClick="textPAGFile"
         android:layout_width="200dp"
+        android:layout_marginBottom="20dp"
         android:layout_height="wrap_content"/>
 
+    <Button
+        android:text="Test PAGPlayer"
+        android:id="@+id/btnPlayer"
+        android:onClick="textPAGPlayer"
+        android:layout_width="200dp"
+        android:layout_marginBottom="20dp"
+        android:layout_height="wrap_content"/>
 
 </LinearLayout>
