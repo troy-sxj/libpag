@@ -1,6 +1,7 @@
 package com.mika.template.pag
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.graphics.ImageFormat
 import android.graphics.YuvImage
 import android.media.Image
@@ -9,14 +10,9 @@ import android.media.MediaCodecInfo.CodecCapabilities
 import android.media.MediaExtractor
 import android.media.MediaFormat
 import android.util.Log
-import com.mika.template.media.decoder.Frame
 import java.io.FileOutputStream
 import java.io.IOException
 import java.util.concurrent.ArrayBlockingQueue
-import android.graphics.BitmapFactory
-
-import android.graphics.Bitmap
-import java.nio.ByteBuffer
 
 
 /**
