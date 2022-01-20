@@ -9,6 +9,10 @@ import com.mika.template.maker.pag.model.PAGTextScene
 import org.libpag.PAGFile
 
 /**
+ * <p>
+ *     load pag file, parse basic info
+ *     TODO: need to change io/parse action async
+ * </p>
  * Author: shangxiaojian
  * Date: 2022/1/19 11:29 上午
  */
@@ -45,7 +49,7 @@ class PAGFileReader(private val context: Context, private var mCallback: PAGFile
         val numTexts = mPAGFile?.numTexts()
         if (numTexts ?: 0 > 0) {
             val textScenes = ArrayList<PAGTextScene>()
-            for (i in 0..numTexts!!) {
+            for (i in 0 until numTexts!!) {
                 val textData = mPAGFile?.getTextData(i)
                 textScenes.add(PAGTextScene(textData!!.text))
             }
@@ -55,12 +59,12 @@ class PAGFileReader(private val context: Context, private var mCallback: PAGFile
         val numImages = mPAGFile?.numImages()
         if (numImages ?: 0 > 0) {
             val textScenes = ArrayList<PAGImageScene>()
-            for (i in 0..numImages!!) {
+            for (i in 0 until numImages!!) {
                 textScenes.add(PAGImageScene(i))
             }
             mPAGSceneInfo.imgScenes = textScenes
         }
-        mCallback?.onPAGLoaded(mPAGSceneInfo)
+        mCallback?.onPAGLoaded(mPAGFile, mPAGSceneInfo)
     }
 
     fun setLoadCallback(callback: PAGFileLoaderCallback) {
@@ -69,7 +73,7 @@ class PAGFileReader(private val context: Context, private var mCallback: PAGFile
 
     interface PAGFileLoaderCallback {
 
-        fun onPAGLoaded(sceneInfo: PAGSceneInfo)
+        fun onPAGLoaded(pageFile: PAGFile?, sceneInfo: PAGSceneInfo)
 
         fun onPAGLoadFailed(errCode: Int, errMsg: String? = null)
     }

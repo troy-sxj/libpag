@@ -2,11 +2,14 @@ package com.mika.template.pag
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.view.View
 import com.mika.template.R
 import com.mika.template.maker.pag.PAGFileReader
 import com.mika.template.maker.pag.model.PAGSceneInfo
+import com.mika.template.maker.pag.player.MultiScenePlayer
+import org.libpag.PAGFile
 
 /**
  * Author: shangxiaojian
@@ -15,19 +18,34 @@ import com.mika.template.maker.pag.model.PAGSceneInfo
 class PAGPlayerActivity : AppCompatActivity() {
 
     private lateinit var mSurfaceView: SurfaceView
+    private lateinit var multiScenePlayer: MultiScenePlayer
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_pag_player)
 
         mSurfaceView = findViewById(R.id.surfaceView)
+        mSurfaceView.holder.addCallback(object: SurfaceHolder.Callback{
+            override fun surfaceCreated(holder: SurfaceHolder?) {
+
+            }
+
+            override fun surfaceChanged(holder: SurfaceHolder?, format: Int, width: Int, height: Int) {
+                holder?.surface?.let { multiScenePlayer.setSurface(it) }
+            }
+
+            override fun surfaceDestroyed(holder: SurfaceHolder?) {
+                multiScenePlayer.release()
+            }
+        })
+        multiScenePlayer = MultiScenePlayer(this)
     }
 
     fun loadPAG(view: View) {
         PAGFileReader(this,
             object : PAGFileReader.PAGFileLoaderCallback {
-                override fun onPAGLoaded(sceneInfo: PAGSceneInfo) {
-                    showAndChoose(sceneInfo)
+                override fun onPAGLoaded(pageFile: PAGFile?, sceneInfo: PAGSceneInfo) {
+                    showAndChoose(pageFile, sceneInfo)
                 }
 
                 override fun onPAGLoadFailed(errCode: Int, errMsg: String?) {
@@ -37,7 +55,10 @@ class PAGPlayerActivity : AppCompatActivity() {
             }).openAssertFile("resources/md5/yanzhixiu.pag")
     }
 
-    private fun showAndChoose(sceneInfo: PAGSceneInfo) {
+    private fun showAndChoose(pageFile: PAGFile?, sceneInfo: PAGSceneInfo) {
+
+        multiScenePlayer.setDataSource(sceneInfo, pageFile!!)
+        multiScenePlayer.start()
 
     }
 }
