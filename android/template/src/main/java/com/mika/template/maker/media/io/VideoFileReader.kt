@@ -1,43 +1,42 @@
-package com.mika.template.pag
+package com.mika.template.maker.media.io
 
 import android.content.Context
 import android.graphics.Bitmap
 import android.media.MediaCodec
-import android.media.MediaCodecInfo.CodecCapabilities
+import android.media.MediaCodecInfo
 import android.media.MediaExtractor
 import android.media.MediaFormat
 import android.util.Log
 import com.mika.template.maker.media.converter.YuvToRgbConverter
 import java.util.concurrent.ArrayBlockingQueue
 
-
 /**
  * Author: shangxiaojian
- * Date: 2022/1/18 5:58 下午
+ * Date: 2022/1/20 2:01 下午
  */
-class MovieExtractor(private val context: Context, private var filePath: String) : Runnable {
+class VideoFileReader(
+    private val context: Context,
+    private var filePath: String,
+    frameQueue: (ArrayBlockingQueue<Bitmap>) -> Unit
+) : Runnable {
 
-    private val TAG = "MovieExtractor"
-
+    private val TAG = "VideoFileReader"
     private lateinit var mExtractor: MediaExtractor
     private var mCodec: MediaCodec? = null
     var videoFormat: MediaFormat? = null
     private var mStop: Boolean = false
     private var mIsEOS = false
-
-    private val mLock = Object()
-
     private var mBufferInfo = MediaCodec.BufferInfo()
 
-
-    private var mCurSampleTime: Long = 0    //当前帧时间戳
-    private var mCurSampleFlag: Int = 0     //当前帧标志
-
-    private var frameIndex = 0
-
-    private var blockQueue: ArrayBlockingQueue<Bitmap> = ArrayBlockingQueue(5)
+    private var width: Int = 0
+    private var height: Int = 0
 
     private lateinit var yuvToRgbConverter: YuvToRgbConverter
+    private var blockQueue: ArrayBlockingQueue<Bitmap> = ArrayBlockingQueue(5)
+
+    init{
+        frameQueue.invoke(blockQueue)
+    }
 
     override fun run() {
         yuvToRgbConverter = YuvToRgbConverter(context)
@@ -55,12 +54,8 @@ class MovieExtractor(private val context: Context, private var filePath: String)
 
                     val bmp = Bitmap.createBitmap(outputImage.width, outputImage.height, Bitmap.Config.ARGB_8888)
                     yuvToRgbConverter.yuvToRgb(outputImage, bmp)
-//                    val bitmapImage = BitmapFactory.decodeByteArray(bytes, 0, bytes.size, null)
 
-                    //TODO sxj how to use frame
-                    Log.d(TAG, "decode one frame")
                     blockQueue.put(bmp)
-
 
                     outputImage.close()
                     mCodec!!.releaseOutputBuffer(index, true)
@@ -71,14 +66,7 @@ class MovieExtractor(private val context: Context, private var filePath: String)
             }
         } catch (e: Exception) {
             e.printStackTrace()
-        } finally {
-            release()
         }
-    }
-
-    fun getFrame(): Bitmap? {
-        if (blockQueue.isEmpty()) return null
-        return blockQueue.poll()
     }
 
     private fun initExtractor() {
@@ -87,7 +75,7 @@ class MovieExtractor(private val context: Context, private var filePath: String)
 
         for (i in 0..mExtractor.trackCount) {
             val mediaFormat = mExtractor.getTrackFormat(i)
-            if (mediaFormat.getString(MediaFormat.KEY_MIME).contains("video")) {
+            if (mediaFormat.getString(MediaFormat.KEY_MIME)?.contains("video") == true) {
                 mExtractor.selectTrack(i)
                 videoFormat = mediaFormat
                 break
@@ -95,23 +83,22 @@ class MovieExtractor(private val context: Context, private var filePath: String)
         }
     }
 
-    private var width: Int = 0
-    private var height: Int = 0
-
     private fun initCodec() {
         val type = videoFormat!!.getString(MediaFormat.KEY_MIME)
         width = videoFormat!!.getInteger(MediaFormat.KEY_WIDTH)
         height = videoFormat!!.getInteger(MediaFormat.KEY_HEIGHT)
         mCodec = MediaCodec.createDecoderByType(type!!)
-        videoFormat!!.setInteger(MediaFormat.KEY_COLOR_FORMAT, CodecCapabilities.COLOR_FormatYUV420Flexible)
+        videoFormat!!.setInteger(
+            MediaFormat.KEY_COLOR_FORMAT,
+            MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Flexible
+        )
 
         mCodec?.configure(videoFormat, null, null, 0)
         mCodec!!.start()
     }
 
-
     private fun pushBufferToDecoder(): Boolean {
-        var inputBufferIndex = mCodec!!.dequeueInputBuffer(1000)
+        val inputBufferIndex = mCodec!!.dequeueInputBuffer(1000)
         var isEndOfStream = false
 
         if (inputBufferIndex >= 0) {
@@ -137,7 +124,6 @@ class MovieExtractor(private val context: Context, private var filePath: String)
         return isEndOfStream
     }
 
-
     private fun pullBufferFromDecoder(): Int {
         var outputEos = false
         var outputBufferIndex = mCodec!!.dequeueOutputBuffer(mBufferInfo, 1000)
@@ -146,13 +132,11 @@ class MovieExtractor(private val context: Context, private var filePath: String)
                 outputEos = true
             }
         }
-
         return outputBufferIndex
     }
 
-    fun release() {
-
+    fun getFrame(): Bitmap? {
+        if (blockQueue.isEmpty()) return null
+        return blockQueue.poll()
     }
-
-
 }

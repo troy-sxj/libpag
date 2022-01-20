@@ -1,19 +1,19 @@
 package com.mika.template.maker.pag.player
 
 import android.content.Context
-import android.graphics.BitmapFactory
+import android.graphics.Bitmap
 import android.os.Handler
 import android.os.HandlerThread
 import android.os.Looper
 import android.os.Message
 import android.view.Surface
+import com.mika.template.maker.media.io.VideoFileReader
+import com.mika.template.maker.pag.PAGUtils
 import com.mika.template.maker.pag.model.PAGSceneInfo
 import org.libpag.PAGFile
-import org.libpag.PAGImage
 import org.libpag.PAGPlayer
 import org.libpag.PAGSurface
-import java.io.IOException
-import java.io.InputStream
+import java.util.concurrent.ArrayBlockingQueue
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import kotlin.math.roundToLong
@@ -28,15 +28,10 @@ class MultiScenePlayer(private val mContext: Context) {
     private var mSceneInfo: PAGSceneInfo? = null
     private var mPagFile: PAGFile? = null
 
-    private val mWorkThreadPool: ExecutorService
     private val mPAGPlayerHandler: PlayerHandler
-    private var handlerThread: HandlerThread
+    private var handlerThread: HandlerThread = HandlerThread(TAG)
 
     init {
-        //if has video scene, thread count defer to scene size
-        mWorkThreadPool = Executors.newFixedThreadPool(6)
-
-        handlerThread = HandlerThread(TAG)
         handlerThread.start()
         mPAGPlayerHandler = PlayerHandler(handlerThread.looper)
     }
@@ -44,6 +39,8 @@ class MultiScenePlayer(private val mContext: Context) {
     fun setDataSource(sceneInfo: PAGSceneInfo, pagFile: PAGFile) {
         mSceneInfo = sceneInfo
         mPagFile = pagFile
+
+        mPAGPlayerHandler.setDataSource(sceneInfo, pagFile)
     }
 
     fun setSurface(surface: Surface) {
@@ -57,31 +54,19 @@ class MultiScenePlayer(private val mContext: Context) {
             mPagFile?.replaceText(index, textData)
         }
 
-//        mSceneInfo?.imgScenes?.forEachIndexed { index, pagImageScene ->
-//            pagImageScene.imgPath?.let {
-//                createPAGImage(it)?.run {
-//                    mPagFile?.replaceImage(index, this)
-//                }
-//            }
-//        }
-        mPagFile?.let { mPAGPlayerHandler.start(it) }
-    }
-
-    private fun createPAGImage(imgPath: String): PAGImage? {
-        var stream: InputStream? = null
-        try {
-            stream = mContext.assets.open(imgPath)
-        } catch (e: IOException) {
-            e.printStackTrace()
+        mSceneInfo?.imgScenes?.forEachIndexed { index, pagImageScene ->
+            pagImageScene.imgPath?.let {
+                PAGUtils.createPAGImage(mContext, it)?.run {
+                    mPagFile?.replaceImage(index, this)
+                }
+            }
         }
-        val bitmap = BitmapFactory.decodeStream(stream) ?: return null
-        return PAGImage.FromBitmap(bitmap)
+        mPAGPlayerHandler.start()
     }
 
     fun release() {
         mPAGPlayerHandler.release()
         handlerThread.quitSafely()
-
     }
 
     inner class PlayerHandler(looper: Looper) : Handler(looper) {
@@ -92,6 +77,10 @@ class MultiScenePlayer(private val mContext: Context) {
         private var updateGap: Long = 42
         private var totalFrames: Int = 0
         private var curFrame: Int = 0
+
+        private lateinit var pagFile: PAGFile
+        private var sceneInfo: PAGSceneInfo? = null
+        private var mWorkThreadPool: ExecutorService? = null
 
         override fun handleMessage(msg: Message) {
             super.handleMessage(msg)
@@ -107,7 +96,29 @@ class MultiScenePlayer(private val mContext: Context) {
             pagPlayer?.surface = PAGSurface.FromSurface(surface)
         }
 
-        fun start(pagFile: PAGFile) {
+        fun setDataSource(sceneInfo: PAGSceneInfo, pagFile: PAGFile) {
+            this.pagFile = pagFile
+            this.sceneInfo = sceneInfo
+        }
+
+        fun prepareAsync() {
+            mWorkThreadPool = Executors.newFixedThreadPool(6)
+            sceneInfo?.videoScenes?.run {
+                this.forEach { sceneItem ->
+                    val videoFileReader =
+                        VideoFileReader(mContext, sceneItem.videoPath, object : (ArrayBlockingQueue<Bitmap>) -> Unit {
+
+                            override fun invoke(blockQueue: ArrayBlockingQueue<Bitmap>) {
+                                sceneItem.blockingQueue = blockQueue
+                            }
+
+                        })
+                    mWorkThreadPool?.execute(videoFileReader)
+                }
+            }
+        }
+
+        fun start() {
             val frameRate = pagFile.frameRate()
 
             totalFrames = (pagFile.duration() * frameRate / 1000000).toInt()
@@ -120,7 +131,7 @@ class MultiScenePlayer(private val mContext: Context) {
 
         private fun updateProgress(frameIndex: Int) {
             val progress = frameIndex % totalFrames * 1.0f / totalFrames
-            val composition = pagPlayer?.composition
+//            val composition = pagPlayer?.composition
 
             pagPlayer?.progress = progress.toDouble()
             pagPlayer?.flush()
@@ -135,5 +146,6 @@ class MultiScenePlayer(private val mContext: Context) {
             pagPlayer?.release()
             pagPlayer = null
         }
+
     }
 }

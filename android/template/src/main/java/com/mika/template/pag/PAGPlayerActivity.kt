@@ -56,9 +56,16 @@ class PAGPlayerActivity : AppCompatActivity() {
     }
 
     private fun showAndChoose(pageFile: PAGFile?, sceneInfo: PAGSceneInfo) {
-
+        sceneInfo.textScenes?.let{
+            it[0].modifiedText = "买"
+            it[1].modifiedText = "3C"
+            it[2].modifiedText = "来京东"
+            it[3].modifiedText = "就对了"
+            it[4].modifiedText = "JD"
+            it[5].modifiedText = "in"
+            it[6].modifiedText = "All"
+        }
         multiScenePlayer.setDataSource(sceneInfo, pageFile!!)
         multiScenePlayer.start()
-
     }
 }

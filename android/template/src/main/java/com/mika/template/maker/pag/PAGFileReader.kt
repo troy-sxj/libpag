@@ -7,6 +7,9 @@ import com.mika.template.maker.pag.model.PAGScene
 import com.mika.template.maker.pag.model.PAGSceneInfo
 import com.mika.template.maker.pag.model.PAGTextScene
 import org.libpag.PAGFile
+import org.libpag.PAGImageLayer
+import org.libpag.PAGLayer
+import org.libpag.PAGPlayer
 
 /**
  * <p>
@@ -60,10 +63,26 @@ class PAGFileReader(private val context: Context, private var mCallback: PAGFile
         if (numImages ?: 0 > 0) {
             val textScenes = ArrayList<PAGImageScene>()
             for (i in 0 until numImages!!) {
+
+                val layersByEditableIndex = mPAGFile?.getLayersByEditableIndex(i, PAGLayer.LayerTypeImage)
+                if(layersByEditableIndex!!.isNotEmpty() && layersByEditableIndex[0] is PAGImageLayer){
+                    val videoRanges = (layersByEditableIndex[0] as PAGImageLayer).contentDuration()
+                    val startTime = (layersByEditableIndex[0] as PAGImageLayer).startTime()
+                    Log.d(TAG, "content duration: $videoRanges, startTime=$startTime")
+//                    if(videoRanges!!.isNotEmpty()){
+//                        val pagVideoRange = videoRanges[0]
+//                        Log.d(TAG, "ImageLayer, startTime=" + pagVideoRange.startTime + ", endTime="+pagVideoRange.endTime)
+//                    }
+                }
+
+                val modifiedPAGImg = PAGUtils.createPAGImage(context, "img/test.png")
+                mPAGFile?.replaceImage(i, modifiedPAGImg!!)
+
                 textScenes.add(PAGImageScene(i))
             }
             mPAGSceneInfo.imgScenes = textScenes
         }
+
         mCallback?.onPAGLoaded(mPAGFile, mPAGSceneInfo)
     }
 

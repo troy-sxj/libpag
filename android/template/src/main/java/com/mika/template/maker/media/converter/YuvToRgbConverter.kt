@@ -1,4 +1,4 @@
-package com.mika.template.pag
+package com.mika.template.maker.media.converter
 
 import android.content.Context
 import android.graphics.Bitmap

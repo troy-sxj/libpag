@@ -1,6 +1,8 @@
 package com.mika.template.maker.pag.model
 
+import android.graphics.Bitmap
 import java.io.Serializable
+import java.util.concurrent.BlockingQueue
 
 /**
  * Author: shangxiaojian
@@ -12,4 +14,4 @@ data class PAGTextScene(val originText: String, var modifiedText: String? = null
 
 data class PAGImageScene(val imageIndex: Int, var imgPath: String? = null) : PAGScene()
 
-data class PAGVideoScene(var videoPath: String) : PAGScene()
+data class PAGVideoScene(var videoPath: String, var blockingQueue: BlockingQueue<Bitmap>? = null) : PAGScene()
