@@ -1,6 +1,7 @@
 package com.mika.template.pag
 
 import android.content.Context
+import android.content.res.AssetFileDescriptor
 import android.graphics.Bitmap
 import android.media.MediaCodec
 import android.media.MediaCodecInfo.CodecCapabilities
@@ -8,6 +9,7 @@ import android.media.MediaExtractor
 import android.media.MediaFormat
 import android.util.Log
 import com.mika.template.maker.media.converter.YuvToRgbConverter
+import java.io.FileDescriptor
 import java.util.concurrent.ArrayBlockingQueue
 
 
@@ -15,7 +17,7 @@ import java.util.concurrent.ArrayBlockingQueue
  * Author: shangxiaojian
  * Date: 2022/1/18 5:58 下午
  */
-class MovieExtractor(private val context: Context, private var filePath: String) : Runnable {
+class MovieExtractor(private val context: Context, private var filePath: AssetFileDescriptor) : Runnable {
 
     private val TAG = "MovieExtractor"
 
@@ -83,7 +85,7 @@ class MovieExtractor(private val context: Context, private var filePath: String)
 
     private fun initExtractor() {
         mExtractor = MediaExtractor()
-        mExtractor.setDataSource(filePath)
+        mExtractor.setDataSource(filePath.fileDescriptor, filePath.startOffset, filePath.length)
 
         for (i in 0..mExtractor.trackCount) {
             val mediaFormat = mExtractor.getTrackFormat(i)

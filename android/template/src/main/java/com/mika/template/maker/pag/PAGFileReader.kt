@@ -2,14 +2,12 @@ package com.mika.template.maker.pag
 
 import android.content.Context
 import android.util.Log
-import com.mika.template.maker.pag.model.PAGImageScene
-import com.mika.template.maker.pag.model.PAGScene
 import com.mika.template.maker.pag.model.PAGSceneInfo
 import com.mika.template.maker.pag.model.PAGTextScene
+import com.mika.template.maker.pag.model.PAGVideoScene
 import org.libpag.PAGFile
 import org.libpag.PAGImageLayer
 import org.libpag.PAGLayer
-import org.libpag.PAGPlayer
 
 /**
  * <p>
@@ -61,26 +59,25 @@ class PAGFileReader(private val context: Context, private var mCallback: PAGFile
 
         val numImages = mPAGFile?.numImages()
         if (numImages ?: 0 > 0) {
-            val textScenes = ArrayList<PAGImageScene>()
+            val videoScenes = ArrayList<PAGVideoScene>()
             for (i in 0 until numImages!!) {
-
                 val layersByEditableIndex = mPAGFile?.getLayersByEditableIndex(i, PAGLayer.LayerTypeImage)
-                if(layersByEditableIndex!!.isNotEmpty() && layersByEditableIndex[0] is PAGImageLayer){
-                    val videoRanges = (layersByEditableIndex[0] as PAGImageLayer).contentDuration()
-                    val startTime = (layersByEditableIndex[0] as PAGImageLayer).startTime()
-                    Log.d(TAG, "content duration: $videoRanges, startTime=$startTime")
-//                    if(videoRanges!!.isNotEmpty()){
-//                        val pagVideoRange = videoRanges[0]
-//                        Log.d(TAG, "ImageLayer, startTime=" + pagVideoRange.startTime + ", endTime="+pagVideoRange.endTime)
-//                    }
+                if (layersByEditableIndex?.isNotEmpty() == true && layersByEditableIndex[0] is PAGImageLayer) {
+                    val curImgLayer = layersByEditableIndex[0] as PAGImageLayer
+
+                    val duration = curImgLayer.localTimeToGlobal(curImgLayer.duration())
+
+
+//                    val duration = curImgLayer.duration()
+                    val startTime = curImgLayer.localTimeToGlobal(curImgLayer.startTime())
+
+//                    Log.d(TAG, "content duration: $contentDuration, startTime=$startTime" + ", duration=" + duration)
+                    val videoPath = "video/vod_" + (i % 3) + ".mp4"
+
+                    videoScenes.add(PAGVideoScene(videoPath, startTime = startTime, duration = duration))
                 }
-
-                val modifiedPAGImg = PAGUtils.createPAGImage(context, "img/test.png")
-                mPAGFile?.replaceImage(i, modifiedPAGImg!!)
-
-                textScenes.add(PAGImageScene(i))
             }
-            mPAGSceneInfo.imgScenes = textScenes
+            mPAGSceneInfo.videoScenes = videoScenes
         }
 
         mCallback?.onPAGLoaded(mPAGFile, mPAGSceneInfo)

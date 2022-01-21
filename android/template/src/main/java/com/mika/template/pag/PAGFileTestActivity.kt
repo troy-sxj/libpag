@@ -38,7 +38,8 @@ class PAGFileTestActivity : AppCompatActivity(), SurfaceHolder.Callback {
         surfaceView = findViewById(R.id.surfaceView)
         surfaceView.holder.addCallback(this)
 
-        movieExtractor = MovieExtractor(this, "/mnt/sdcard/videokit/test.mp4")
+        val openFd = assets.openFd("video/test.mp4")
+        movieExtractor = MovieExtractor(this, openFd)
         threadPool.execute(movieExtractor)
 
         val handlerThread = HandlerThread("PAGPlayer")

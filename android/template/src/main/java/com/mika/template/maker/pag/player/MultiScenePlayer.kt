@@ -6,13 +6,12 @@ import android.os.Handler
 import android.os.HandlerThread
 import android.os.Looper
 import android.os.Message
+import android.util.Log
 import android.view.Surface
 import com.mika.template.maker.media.io.VideoFileReader
 import com.mika.template.maker.pag.PAGUtils
 import com.mika.template.maker.pag.model.PAGSceneInfo
-import org.libpag.PAGFile
-import org.libpag.PAGPlayer
-import org.libpag.PAGSurface
+import org.libpag.*
 import java.util.concurrent.ArrayBlockingQueue
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -93,12 +92,14 @@ class MultiScenePlayer(private val mContext: Context) {
         }
 
         fun setSurface(surface: Surface) {
+
             pagPlayer?.surface = PAGSurface.FromSurface(surface)
         }
 
         fun setDataSource(sceneInfo: PAGSceneInfo, pagFile: PAGFile) {
             this.pagFile = pagFile
             this.sceneInfo = sceneInfo
+            prepareAsync()
         }
 
         fun prepareAsync() {
@@ -131,15 +132,35 @@ class MultiScenePlayer(private val mContext: Context) {
 
         private fun updateProgress(frameIndex: Int) {
             val progress = frameIndex % totalFrames * 1.0f / totalFrames
-//            val composition = pagPlayer?.composition
+            if (pagPlayer?.composition is PAGFile) {
+                loadFrame(pagPlayer?.composition as PAGFile)
+            }
 
             pagPlayer?.progress = progress.toDouble()
+
             pagPlayer?.flush()
             sendEmptyMessageDelayed(MSG_UPDATE_PROGRESS, updateGap)
         }
 
-        private fun loadFrame() {
+        private fun loadFrame(pagFile: PAGFile?) {
+            if (pagFile == null) return
+            val curProgress = pagFile.currentTime()
+            sceneInfo?.videoScenes?.run {
+                this.forEachIndexed { index, pagVideoScene ->
 
+                    Log.d(
+                        TAG, "loadFrame, curProgress =" + curProgress
+                                + " , range[" + pagVideoScene.startTime + "," + (pagVideoScene.startTime + pagVideoScene.duration) + "]"
+                    )
+
+                    if (pagVideoScene.inTimeRange(curProgress)) {
+                        Log.d(TAG, "loadFrame, index=" + index)
+                        if(pagVideoScene.blockingQueue?.isNotEmpty() == true){
+                            pagFile.replaceImage(index, PAGImage.FromBitmap(pagVideoScene.blockingQueue!!.poll()))
+                        }
+                    }
+                }
+            }
         }
 
         fun release() {

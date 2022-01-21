@@ -14,4 +14,17 @@ data class PAGTextScene(val originText: String, var modifiedText: String? = null
 
 data class PAGImageScene(val imageIndex: Int, var imgPath: String? = null) : PAGScene()
 
-data class PAGVideoScene(var videoPath: String, var blockingQueue: BlockingQueue<Bitmap>? = null) : PAGScene()
+data class PAGVideoScene(
+    var videoPath: String,
+    var startTime: Long = 0,
+    var duration: Long = 0,
+    var blockingQueue: BlockingQueue<Bitmap>? = null
+) : PAGScene() {
+
+    fun inTimeRange(timeStamp: Long): Boolean {
+        if (timeStamp >= startTime && timeStamp <= (startTime + duration)) {
+            return true
+        }
+        return false
+    }
+}

@@ -71,7 +71,8 @@ class VideoFileReader(
 
     private fun initExtractor() {
         mExtractor = MediaExtractor()
-        mExtractor.setDataSource(filePath)
+        val openFd = context.assets.openFd(filePath)
+        mExtractor.setDataSource(openFd.fileDescriptor, openFd.startOffset, openFd.length)
 
         for (i in 0..mExtractor.trackCount) {
             val mediaFormat = mExtractor.getTrackFormat(i)
