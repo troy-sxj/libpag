@@ -42,15 +42,15 @@
 
     if ([pagFile numTexts] > 0) {
         PAGText* textData = [pagFile getTextData:0];
-        textData.text = @"hah哈哈哈哈哈👌하";
+        textData.text = @"hah哈 哈哈哈哈👌하";
         [pagFile replaceText:0 data:textData];
     }
 
     if ([pagFile numImages] > 0) {
-        NSString* filePath = [[NSBundle mainBundle] pathForResource:@"mountain" ofType:@"jpg"];
-        CVPixelBufferRef pixelBuffer = [self pixelBufferFromPath:filePath];
-        PAGImage* pagImage = [PAGImage FromPixelBuffer:pixelBuffer];
-//        PAGImage* pagImage = [PAGImage FromPath:filePath];
+        NSString* filePath = [[NSBundle mainBundle] pathForResource:@"rotation" ofType:@"jpg"];
+//        CVPixelBufferRef pixelBuffer = [self pixelBufferFromPath:filePath];
+//        PAGImage* pagImage = [PAGImage FromPixelBuffer:pixelBuffer];
+        PAGImage* pagImage = [PAGImage FromPath:filePath];
         if (pagImage) {
             [pagFile replaceImage:0 data:pagImage];
         }

@@ -7,12 +7,12 @@
     "common": [
       {
         "url": "${PAG_GROUP}/vendor_tools.git",
-        "commit": "27837194cf1834bcdf2bc2643655bdebcf2a67e9",
+        "commit": "1d38eb7b0f428a266a6d6befc07a3d95749c7ef3",
         "dir": "vendor_tools"
       },
       {
         "url": "${PAG_GROUP}/pathkit.git",
-        "commit": "cb2e612b0fe03c56bd3b8ea3d87ceee35d438c4a",
+        "commit": "e8ba79d59c62c23669a7df0a213664239069413f",
         "dir": "third_party/pathkit"
       },
       {
@@ -22,12 +22,12 @@
       },
       {
         "url": "${PAG_GROUP}/libavc.git",
-        "commit": "dfc550bc75eef789eae8f0b0bfb954e11f7740e4",
+        "commit": "c2bf4c84a6d39788929e59514417e819185af98e",
         "dir": "third_party/libavc"
       },
       {
         "url": "${PAG_GROUP}/swiftshader.git",
-        "commit": "8d781475d99e8c1582f4c0da44b54ba105f8b79a",
+        "commit": "040ee43bfeba9b6b532dbd8222df737aac2d55b1",
         "dir": "third_party/swiftshader"
       },
       {
@@ -69,32 +69,6 @@
         "url": "https://github.com/nlohmann/json.git",
         "commit": "fec56a1a16c6e1c1b1f4e116a20e79398282626c",
         "dir": "third_party/json"
-      }
-    ]
-  },
-  "files": {
-    "mac": [
-      {
-        "url": "${PAG_GROUP}/swiftshader/releases/download/opengl/mac.zip",
-        "dir": "third_party/out/swiftshader",
-        "unzip": true
-      },
-      {
-        "url": "${PAG_GROUP}/ffavc/releases/download/0.9.0/ffavc_0.9.0_release_mac_x64.zip",
-        "dir": "vendor/ffavc",
-        "unzip": true
-      }
-    ],
-    "win": [
-      {
-        "url": "${PAG_GROUP}/swiftshader/releases/download/opengl/win.zip",
-        "dir": "third_party/out/swiftshader",
-        "unzip": true
-      },
-      {
-        "url": "${PAG_GROUP}/angle/releases/download/chromium_4763/win.zip",
-        "dir": "vendor/angle",
-        "unzip": true
       }
     ]
   },

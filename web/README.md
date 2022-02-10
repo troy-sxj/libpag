@@ -1,20 +1,46 @@
-# libpag Web
+<img src="../resources/readme/logo.png" alt="PAG Logo" width="474"/>
 
-> **当前版本为 Alpha 版本，部分功能不够稳定**
-> 
-> **有问题可到[Issues](https://github.com/Tencent/libpag/issues)，会尽快修复**
+English | [简体中文](./README.zh_CN.md) | [Homepage](https://pag.io)
+
+> **The current version is Alpha version, some APIs is not stable enough.**
 >
-> **更多特性持续开发中**
+> **If there is any problem, please go to [Issues](https://github.com/Tencent/libpag/issues) reported, we will be fixed as soon as possible.**
+>
+> **More features are under development.**
 
-## 特性
+## Introduction
 
-- 支持播放矢量、位图、视频序列帧 PAG 文件
+libpag is a real-time rendering library for PAG (Portable Animated Graphics) files that renders both
+vector-based and raster-based animations across most platforms, such as iOS, Android, macOS,
+Windows, Linux, and Web.
 
-- 基于 WebAssembly
+## Features
 
-## 快速开始
+- Support all libpag features on the Web environment
 
-可以用 locateFile 函数返回 wasm 文件的路径，默认为 libpag.js 同目录下。
+- Based on WebAssembly and WebGL.
+
+## Quick start
+
+You could use the `locateFile` function to return the path of `libpag.wasm` file, the default path is the same as `libpag.js` 's path.
+
+### Browser (Recommend)
+
+```html
+<canvas class="canvas" id="pag"></canvas>
+<script src="https://unpkg.com/libpag@latest/lib/libpag.min.js"></script>
+<script>
+  window.libpag.PAGInit().then((PAG) => {
+    const url = 'https://pag.io/file/like.pag';
+    fetch(url)
+      .then((response) => response.blob())
+      .then(async (blob) => {
+        const file = new window.File([blob], url.replace(/(.*\/)*([^.]+)/i, '$2'));
+        // Do Something.
+      });
+  });
+</script>
+```
 
 ### EsModule
 
@@ -28,7 +54,7 @@ import { PAGInit } from 'libpag';
 PAGInit({
   locateFile: (file) => './node_modules/libpag/lib/' + file,
 }).then((PAG) => {
-  const url = 'https://pag.io/file/like.pag'
+  const url = 'https://pag.io/file/like.pag';
   fetch(url)
     .then((response) => response.blob())
     .then(async (blob) => {
@@ -38,25 +64,8 @@ PAGInit({
 });
 ```
 
-### Browser
-
-```html
-<canvas class="canvas" id="pag"></canvas>
-<script src="https://unpkg.com/libpag@latest/lib/libpag.min.js"></script>
-<script>
-  window.libpag
-    .PAGInit()
-    .then((PAG) => {
-      const url = 'https://pag.io/file/like.pag'
-      fetch(url)
-        .then((response) => response.blob())
-        .then(async (blob) => {
-          const file = new window.File([blob], url.replace(/(.*\/)*([^.]+)/i, '$2'));
-          // Do Something.
-        });
-    });
-</script>
-```
+If you use ESModule to import SDK, you have to build the web program including the `libpag.wasm` file that is under node_modules folder.
+Then use the `locateFile` function to return the path of the `libpag.wasm` .
 
 ### PAG Demo
 
@@ -70,63 +79,64 @@ pagView.setRepeatCount(0);
 await pagView.play();
 ```
 
-npm package 中提供了多种构建产物，可以阅读 [这里](./doc/develop-install.md) 了解不同目录下产物的差别。
+Offer much product in the npm package after building. You could read the [doc](./doc/develop-install.md) about them.
 
-更多的API接口可以阅读 [API文档](https://pag.io/api.html#/apis/web/)。
+More doc such as [demo]((./demo/)), [API](https://pag.io/api.html#/apis/web/).
 
-## 浏览器兼容性
+## Browser
 
-| [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/chrome/chrome_48x48.png" alt="Chrome" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)<br/>Chrome | [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/safari/safari_48x48.png" alt="Safari" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)<br/>Safari |
-| ------------------------------------------------------------ | ------------------------------------------------------------ |
-| Chrome >= 87                                                 | Safari >= 11.1                                               |
+| [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/chrome/chrome_48x48.png" alt="Chrome" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)<br/>Chrome | [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/safari/safari_48x48.png" alt="Safari" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)<br/>Safari | [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/chrome/chrome_48x48.png" alt="Chrome" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)<br/>Chrome for Android | [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/safari/safari_48x48.png" alt="Safari" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)<br/>Safari on iOS |
+| ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| Chrome >= 69                                                 | Safari >= 11.3                                               | Android >= 7.0                                               | iOS >= 11.3                                                  |
 
-Chrome 69+ 与 Firefox 等更多版本的兼容工作正在进行中
+More versions will be coming soon.
 
-## 前置工作
+## Roadmap
 
-需要确保已经可编译 C++ libpag 库，并且安装 [Emscripten 套件](https://emscripten.org/docs/getting_started/downloads.html) 和 Node 依赖
+The [roadmap](https://github.com/Tencent/libpag/wiki/PAG-Web-roadmap) doc of the PAG web SDK.
+
+## Development
+
+### Dependency Management
+
+Need installed C++ deps about [libpag](https://github.com/Tencent/libpag),  [Emscripten](https://emscripten.org/docs/getting_started/downloads.html), and [Node](https://nodejs.org/).
 
 ```bash
-// 安装Node依赖
 $ npm install
 ```
 
-## 生产流程
+### Debug
 
-执行 `build.sh` 脚本
+Remove `cmake-build-debug` folder that in libpag root folder, run `build.sh debug` to build `libpag.wasm` file.
 
-```bash
-// web/script目录下
-$ cd script
-// 添加执行权限
-$ chmod +x ./build.sh
-// 打包
-$ ./build.sh
-```
-
-## 开发流程
-
-删除项目根目录的 `cmake-build-debug`，执行 `build.sh debug` 打包 C++ 代码，每次改动 C++ 代码都需要重新打包新的 `libpag.wasm` 文件，执行完成之后可以通过 `Tools->CMake->Reload CMake Project` 刷新项目
+If you use CLion IDE, you cloud reload the project by `Tools->CMake->Reload CMake Project`.
 
 ```bash
-// web/script目录下
+# ./web/script/
 $ cd script
-// 添加执行权限
 $ chmod +x ./build.sh
-// 打包
 $ ./build.sh debug
 ```
 
-打包 Typescript 文件，修改 Typescript 文件会自动打包到 Javascript 文件
+Build Typescript file.
 
 ```bash
-// web目录下
+# ./web/
 $ npm run dev
 ```
 
-启动 HTTP 服务
+Start HTTP server.
 
 ```bash
-// libpag根目录下
+# ./
 $ emrun --browser chrome --serve_root . --port 8081 ./web/demo/index.html
+```
+
+### release
+
+```bash
+# ./web/script
+$ cd script
+$ chmod +x ./build.sh
+$ ./build.sh
 ```

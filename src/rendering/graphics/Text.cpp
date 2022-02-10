@@ -16,12 +16,11 @@
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include <unordered_map>
-
 #include "Text.h"
-#include "core/Canvas.h"
+#include <unordered_map>
+#include "core/PathEffect.h"
+#include "gpu/Canvas.h"
 #include "pag/file.h"
-#include "raster/PathEffect.h"
 
 namespace pag {
 static std::unique_ptr<Paint> CreateFillPaint(const Glyph* glyph) {

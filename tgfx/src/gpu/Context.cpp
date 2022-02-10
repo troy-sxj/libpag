@@ -16,11 +16,11 @@
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "Context.h"
+#include "gpu/Context.h"
 #include "GradientCache.h"
 #include "Program.h"
-#include "Resource.h"
 #include "base/utils/GetTimer.h"
+#include "gpu/Resource.h"
 
 namespace pag {
 #define MAX_PROGRAM_COUNT 128
@@ -40,13 +40,13 @@ class PurgeGuard {
   Context* context = nullptr;
 };
 
-Context::Context() {
+Context::Context(Device* device) : device(device) {
   gradientCache = new GradientCache(this);
 }
 
 Context::~Context() {
-  // The subclass must call releaseAll() before the Context is destructed to clean up all GPU
-  // resources.
+  // The Device owner must call releaseAll() before deleting this Context, otherwise, GPU resources
+  // may leak.
   DEBUG_ASSERT(nonpurgeableResources.empty());
   DEBUG_ASSERT(pendingRemovedResources.empty());
   DEBUG_ASSERT(recycledResources.empty());

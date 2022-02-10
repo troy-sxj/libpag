@@ -16,7 +16,7 @@ PAG 方案是一套完善的动画工作流。提供从 AE（Adobe After Effects
 PAG 方案目前已经接入了腾讯系 40 余款应用，包括微信，手机QQ，王者荣耀，腾讯视频，QQ音乐等头部产品，稳定性经过了海量用户的持续验证，可以广泛应用于UI动画、贴纸
 动画、视频编辑、模板设计等场景。典型应用场景可以参考[官网案例](https://pag.io/case.html)。
 
-详细介绍可以参考](相关报道：
+详细介绍可以参考相关报道：
  
  - [王者QQ微信都在用的动画神器要开源了：把交付时间缩短90%](https://mp.weixin.qq.com/s/a8-yOp8h5LiFGKSdLE_toA)
  - [腾讯推出移动端动画组件PAG，释放设计生产力](https://mp.weixin.qq.com/s/STxOMV2lqGdGu-9mBkAz_A)
@@ -31,7 +31,7 @@ PAG 方案目前已经接入了腾讯系 40 余款应用，包括微信，手机
 
 - **全 AE 特性支持**
 
-<img src="resources/readme/intro_2.png" alt="intro_2" width="281"/>
+<img src="resources/readme/intro_2.png" alt="intro_2" width="282"/>
 
 在纯矢量导出方式上支持更多 AE 特性的同时，还引入了BMP预合成结合矢量的混合导出能力，实现支持所有 AE 特性的同时又能保持动画运行时的可编辑性。
 
