@@ -51,6 +51,7 @@ class PAGFileTestActivity : AppCompatActivity(), SurfaceHolder.Callback {
 
     private fun loadPAGFile() {
         mPAGFile = PAGFile.Load(assets, "resources/timestretch/repeat.pag")
+//        mPAGFile?.replaceImage(0, PAGImage.FromAssets(assets, "img/test.jpg"))
     }
 
     override fun surfaceCreated(holder: SurfaceHolder?) {
@@ -72,6 +73,18 @@ class PAGFileTestActivity : AppCompatActivity(), SurfaceHolder.Callback {
 
     override fun surfaceDestroyed(holder: SurfaceHolder?) {
         Log.d(TAG, "surfaceDestroyed")
+        release()
+    }
+
+    override fun onDestroy() {
+        release()
+        super.onDestroy()
+    }
+
+    private fun release(){
+        mPagPlayerHandler?.release()
+        mPAGFile?.removeAllLayers()
+        mPAGPlayer = null
     }
 
     inner class PlayerHandler(looper: Looper) : Handler(looper) {
@@ -119,7 +132,7 @@ class PAGFileTestActivity : AppCompatActivity(), SurfaceHolder.Callback {
                     composition.replaceImage(0, loadFrame)
                 }
 //                composition.replaceImage(0, PAGImage.FromA)
-//                composition.replaceImage(0, PAGImage.FromAssets(assets, "video/test.png"))
+//                composition.replaceImage(0, PAGImage.FromAssets(assets, "img/test.jpg"))
             }
             pagPlayer.progress = progress.toDouble()
 //            Log.d(TAG, "updateProgress ---- progress = $progress")
@@ -130,10 +143,14 @@ class PAGFileTestActivity : AppCompatActivity(), SurfaceHolder.Callback {
         private fun loadFrame():PAGImage?{
            movieExtractor.getFrame()?.let{
                 return PAGImage.FromBitmap(it)
-//               return PAGImage.FromBytes(ByteArray(it.buffer!!.remaining()))
            }
             return null
+        }
 
+        fun release(){
+            pagPlayer.surface?.freeCache()
+            pagPlayer.surface = null
+            pagPlayer.release()
         }
     }
 

@@ -148,13 +148,13 @@ class MultiScenePlayer(private val mContext: Context) {
             sceneInfo?.videoScenes?.run {
                 this.forEachIndexed { index, pagVideoScene ->
 
-                    Log.d(
-                        TAG, "loadFrame, curProgress =" + curProgress
-                                + " , range[" + pagVideoScene.startTime + "," + (pagVideoScene.startTime + pagVideoScene.duration) + "]"
-                    )
+//                    Log.d(
+//                        TAG, "loadFrame, curProgress =" + curProgress
+//                                + " , range[" + pagVideoScene.startTime + "," + (pagVideoScene.startTime + pagVideoScene.duration) + "]"
+//                    )
 
                     if (pagVideoScene.inTimeRange(curProgress)) {
-                        Log.d(TAG, "loadFrame, index=" + index)
+//                        Log.d(TAG, "loadFrame, index=" + index)
                         if(pagVideoScene.blockingQueue?.isNotEmpty() == true){
                             pagFile.replaceImage(index, PAGImage.FromBitmap(pagVideoScene.blockingQueue!!.poll()))
                         }

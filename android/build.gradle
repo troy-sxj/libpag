@@ -34,5 +34,5 @@ task clean(type: Delete) {
 }
 
 ext {
-    remoteMaven = true
+    remoteMaven = false
 }

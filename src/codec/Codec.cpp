@@ -196,11 +196,14 @@ DecodeStream ReadBodyBytes(DecodeStream* stream) {
 std::shared_ptr<File> Codec::Decode(const void* bytes, uint32_t byteLength,
                                     const std::string& filePath) {
   CodecContext context = {};
+  //构建 解码流对象
   DecodeStream stream(&context, reinterpret_cast<const uint8_t*>(bytes), byteLength);
+  //解析pag文件头，校验文件
   auto bodyBytes = ReadBodyBytes(&stream);
   if (context.hasException()) {
     return nullptr;
   }
+  //解析pag tag：pag文件是由一个个tag组成的，每个tag分为 TagCode Length Content 三部分
   ReadTags(&bodyBytes, &context, ReadTagsOfFile);
   InstallReferences(context.compositions);
   if (context.hasException()) {
