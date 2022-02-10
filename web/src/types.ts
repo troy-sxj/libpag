@@ -10,8 +10,15 @@ import { PAGView } from './pag-view';
 import { PAGFont } from './pag-font';
 import { PAGPlayer } from './pag-player';
 import { PAGLayer } from './pag-layer';
+import { PAGComposition } from './pag-composition';
 import { NativeImage } from './core/native-image';
 import { WebMask } from './core/web-mask';
+
+declare global {
+  interface Window {
+    WeixinJSBridge?: any;
+  }
+}
 
 export interface PAG extends EmscriptenModule {
   _PAGFile: {
@@ -25,6 +32,7 @@ export interface PAG extends EmscriptenModule {
   _PAGSurface: {
     FromCanvas: (canvasID: string) => Promise<PAGSurface>;
     FromTexture: (textureID: number, width: number, height: number, flipY: boolean) => Promise<PAGSurface>;
+    FromFrameBuffer: (framebufferID: number, width: number, height: number, flipY: boolean) => Promise<PAGSurface>;
   };
   VectorString: any;
   webAssemblyQueue: WebAssemblyQueue;
@@ -34,6 +42,7 @@ export interface PAG extends EmscriptenModule {
   PAGFont: typeof PAGFont;
   PAGImage: typeof PAGImage;
   PAGLayer: typeof PAGLayer;
+  PAGComposition: typeof PAGComposition;
   NativeImage: typeof NativeImage;
   WebMask: typeof WebMask;
   ScalerContext: typeof ScalerContext;
@@ -209,4 +218,29 @@ export enum LayerType {
   Shape,
   Image,
   PreCompose,
+}
+
+/**
+ * Defines the rules on how to stretch the timeline of content to fit the specified duration.
+ */
+export enum PAGTimeStretchMode {
+  /**
+   * Keep the original playing speed, and display the last frame if the content's duration is less
+   * than target duration.
+   */
+  None = 0,
+  /*
+   * Change the playing speed of the content to fit target duration.
+   */
+  Scale = 1,
+  /**
+   * Keep the original playing speed, but repeat the content if the content's duration is less than
+   * target duration. This is the default mode.
+   */
+  Repeat = 2,
+  /**
+   * Keep the original playing speed, but repeat the content in reversed if the content's duration
+   * is less than target duration.
+   */
+  RepeatInverted = 3,
 }

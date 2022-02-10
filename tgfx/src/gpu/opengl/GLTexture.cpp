@@ -18,8 +18,8 @@
 
 #include "GLTexture.h"
 #include "GLUtil.h"
+#include "core/Bitmap.h"
 #include "gpu/Surface.h"
-#include "image/Bitmap.h"
 
 namespace pag {
 class GLBackendTexture : public GLTexture {
@@ -225,13 +225,12 @@ void Trace(const Texture* texture, const std::string& path) {
   }
   auto canvas = surface->getCanvas();
   canvas->drawTexture(texture);
-  Bitmap bitmap = {};
-  if (!bitmap.allocPixels(texture->width(), texture->height())) {
+  auto pixelBuffer = PixelBuffer::Make(texture->width(), texture->height());
+  Bitmap bitmap(pixelBuffer);
+  if (bitmap.isEmpty()) {
     return;
   }
-  auto pixels = bitmap.lockPixels();
-  surface->readPixels(bitmap.info(), pixels);
-  bitmap.unlockPixels();
+  surface->readPixels(bitmap.info(), bitmap.writablePixels());
   Trace(bitmap, path);
 }
 }  // namespace pag

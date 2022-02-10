@@ -17,7 +17,6 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "GPUDrawable.h"
-
 #include "gpu/Surface.h"
 #include "gpu/opengl/GLDefines.h"
 
@@ -45,7 +44,7 @@ std::shared_ptr<Device> GPUDrawable::getDevice() {
     return nullptr;
   }
   if (window == nullptr) {
-    window = WEBGLWindow::MakeFrom(canvasID);
+    window = WebGLWindow::MakeFrom(canvasID);
   }
   return window->getDevice();
 }
