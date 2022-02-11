@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.*
 import android.widget.FrameLayout
 import com.mika.template.R
+import com.mika.template.maker.media.decoder.VideoExtractor
 import org.libpag.*
 import java.util.concurrent.Executors
 import kotlin.math.roundToLong
@@ -28,7 +29,7 @@ class PAGFileTestActivity : AppCompatActivity(), SurfaceHolder.Callback {
     private var mPagPlayerHandler: PlayerHandler? = null
     private val threadPool = Executors.newFixedThreadPool(2)
 
-    private lateinit var movieExtractor:MovieExtractor
+    private lateinit var movieExtractor: VideoExtractor
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,7 +40,7 @@ class PAGFileTestActivity : AppCompatActivity(), SurfaceHolder.Callback {
         surfaceView.holder.addCallback(this)
 
         val openFd = assets.openFd("video/test.mp4")
-        movieExtractor = MovieExtractor(this, openFd)
+        movieExtractor = VideoExtractor(this, openFd)
         threadPool.execute(movieExtractor)
 
         val handlerThread = HandlerThread("PAGPlayer")
@@ -81,7 +82,7 @@ class PAGFileTestActivity : AppCompatActivity(), SurfaceHolder.Callback {
         super.onDestroy()
     }
 
-    private fun release(){
+    private fun release() {
         mPagPlayerHandler?.release()
         mPAGFile?.removeAllLayers()
         mPAGPlayer = null
@@ -95,7 +96,7 @@ class PAGFileTestActivity : AppCompatActivity(), SurfaceHolder.Callback {
         var updateGap: Long = 42
 
         var totalFrames: Int = 0
-        var curFrame:Int = 0
+        var curFrame: Int = 0
 
         override fun handleMessage(msg: Message) {
             super.handleMessage(msg)
@@ -126,9 +127,9 @@ class PAGFileTestActivity : AppCompatActivity(), SurfaceHolder.Callback {
         private fun updateProgress(frameIndex: Int) {
             val progress = frameIndex % totalFrames * 1.0f / totalFrames
             val composition = pagPlayer.composition
-            if(composition is PAGFile){
+            if (composition is PAGFile) {
                 val loadFrame = loadFrame()
-                if(loadFrame != null){
+                if (loadFrame != null) {
                     composition.replaceImage(0, loadFrame)
                 }
 //                composition.replaceImage(0, PAGImage.FromA)
@@ -140,14 +141,11 @@ class PAGFileTestActivity : AppCompatActivity(), SurfaceHolder.Callback {
             sendEmptyMessageDelayed(MSG_UPDATE_PROGRESS, updateGap)
         }
 
-        private fun loadFrame():PAGImage?{
-           movieExtractor.getFrame()?.let{
-                return PAGImage.FromBitmap(it)
-           }
-            return null
+        private fun loadFrame(): PAGImage? {
+            return movieExtractor.getFrame()
         }
 
-        fun release(){
+        fun release() {
             pagPlayer.surface?.freeCache()
             pagPlayer.surface = null
             pagPlayer.release()
